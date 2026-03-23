@@ -1,5 +1,4 @@
-call C:\ProgramData\Miniconda3\Scripts\activate.bat C:\ProgramData\Miniconda3
-call conda activate DICOM_Repair 
-call cd "M:\DICOM_IMPORT\DICOM_Import_Repair"
-M:
-call pythonw.exe dicom_repair.py
+@echo off
+set "APP_DIR=%~dp0"
+cd /d "%APP_DIR%"
+"%APP_DIR%\.venv\Scripts\pythonw.exe" "%APP_DIR%\dicom_repair.py"
