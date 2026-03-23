@@ -4,6 +4,7 @@ from pathlib import Path
 from typing import Any, Dict, List
 
 import FreeSimpleGUI as sg
+from app_config import get_gui_test_paths
 
 # %% GUI Progress bar class
 class ProgressBar(sg.ProgressBar):
@@ -320,9 +321,7 @@ def wait_for_acknowledgement(window: sg.Window):
 # %% Main
 def main():
     '''Testing'''
-    #data_path = Path.cwd() / 'DICOM Test Data'
-    output_path = Path.cwd() / 'Output'
-    test_data_path = Path(r'W:\Python Projects\DICOM Repair\DICOM Test Data\Invalid^Characters [Error3]\Series 012 [PT - MAC]')
+    test_data_path, output_path = get_gui_test_paths()
 
     window = make_window(starting_input_path=test_data_path,
                          starting_output_path=output_path)

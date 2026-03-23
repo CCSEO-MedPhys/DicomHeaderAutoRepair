@@ -6,21 +6,19 @@ from functools import partial
 from dicom_repair_tools import scan_dicom_images, count_repairs
 from dicom_repair_tools import perform_repairs
 from dicom_repair_functions import REPAIR_METHODS
+from app_config import get_main_default_paths
 
 from dicom_repair_gui import make_window, get_file_paths, status_output
 from dicom_repair_gui import wait_for_acknowledgement
-
-# %% Default Paths
-INPUT_PATH = r'\\dkphysicspv1\Radiation_Therapy\DICOM_IMPORT\MicroDicom'
-OUTPUT_PATH = r'\\dkphysicspv1\Radiation_Therapy\DICOM_IMPORT\Import Repair\repaired'
 
 
 # %% Main
 def main():
     '''Primary function for running DICOM repairs.'''
     # Build the GUI
-    window = make_window(starting_input_path=INPUT_PATH,
-                         starting_output_path=OUTPUT_PATH)
+    input_default_path, output_default_path = get_main_default_paths()
+    window = make_window(starting_input_path=input_default_path,
+                         starting_output_path=output_default_path)
     repair_log = []
     status_update = partial(status_output, main_window=window,
                             status_element=window['Status'],

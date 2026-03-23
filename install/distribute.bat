@@ -4,3 +4,4 @@ xcopy ..\requirements.txt ".\For Distribution" /V /Y
 xcopy ..\LICENSE.txt ".\For Distribution" /V /Y
 xcopy ..\README.md ".\For Distribution" /V /Y
 xcopy ..\Icons\DICOM Repair.ico ".\For Distribution" /V /Y
+xcopy ..\dicom_repair_config.toml ".\For Distribution" /V /Y

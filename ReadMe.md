@@ -35,6 +35,13 @@ Development and notebooks:
 python -m pip install -r requirements-dev.txt
 ```
 
+## Path configuration
+
+The script will search for initial input and output folders in the dicom_repair_config.toml file.
+The supplied paths can be absolute or relative to the location of the script.
+If the input_path folder does not exist, the script will raise an error.
+If the output_path folder does not exist, the script will create it.
+
 ## Source Files
 
 - dicom_repair_tools

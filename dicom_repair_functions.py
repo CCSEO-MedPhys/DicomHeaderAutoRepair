@@ -19,6 +19,10 @@ The do_repairs function
         status_output (Callable): A function taking one string parameter.
             Passed to each of the repair_methods. Used for reporting the
             results of the repair.
+
+To add a new repair method, simply create a new function with the same set of
+arguments as the existing repair functions, and add the function to the
+REPAIR_METHODS list.
 '''
 # %% Imports
 from typing import Callable
