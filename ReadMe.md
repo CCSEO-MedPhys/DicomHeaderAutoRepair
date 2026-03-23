@@ -19,6 +19,22 @@ encountered importing into Eclipse.
 - xlwings
 - jupyterlab
 
+## Install
+
+Recommended: create and activate a virtual environment before installing dependencies.
+
+Runtime only:
+
+```bash
+python -m pip install -r requirements.txt
+```
+
+Development and notebooks:
+
+```bash
+python -m pip install -r requirements-dev.txt
+```
+
 ## Source Files
 
 - dicom_repair_tools

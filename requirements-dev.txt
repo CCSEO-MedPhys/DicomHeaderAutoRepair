@@ -1,0 +1,7 @@
+# Development and notebook dependencies
+-r requirements.txt
+
+pandas
+xlwings
+jupyterlab
+ipykernel

@@ -3,7 +3,7 @@
 from pathlib import Path
 from typing import Any, Dict, List
 
-import PySimpleGUI as sg
+import FreeSimpleGUI as sg
 
 # %% GUI Progress bar class
 class ProgressBar(sg.ProgressBar):
