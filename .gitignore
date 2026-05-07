@@ -207,3 +207,4 @@ DICOM Test Data
 *.code-workspace
 Environment
 Old Code
+*.zip
