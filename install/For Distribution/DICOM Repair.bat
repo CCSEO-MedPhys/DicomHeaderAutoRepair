@@ -1,2 +1,2 @@
 @echo off
-".\.venv\Scripts\pythonw.exe" ".\dicom_repair.py"
+".\.venv\Scripts\python.exe" ".\dicom_repair.py"

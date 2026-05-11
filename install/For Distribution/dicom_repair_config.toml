@@ -1,0 +1,9 @@
+[main]
+# Default folders shown in the main application GUI.
+input_path = "M:\\DICOM_IMPORT\\MicroDicom"
+output_path = "\\\\dkphysicspv1\\Radiation_Therapy\\DICOM_IMPORT\\Import Repair\\repaired"
+
+[gui_test]
+# Default folders used by dicom_repair_gui.py when run directly.
+test_data_path = ".\\Python Projects\\DICOM Repair\\DICOM Test Data"
+output_path = "Output"

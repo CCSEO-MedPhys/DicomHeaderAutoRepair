@@ -1,5 +1,5 @@
 rem Copy all python files except __init__.py to the "For Distribution" folder
-xcopy ".\*.py" ".\For Distribution" /V /Y
+xcopy "..\*.py" ".\For Distribution" /V /Y
 del ".\For Distribution\__init__.py"
 
 rem Build and copy the requirements.txt file to the "For Distribution" folder
