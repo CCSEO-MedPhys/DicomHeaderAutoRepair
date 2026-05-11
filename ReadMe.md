@@ -7,9 +7,9 @@ encountered importing into Eclipse.
 
 ### Required Packages
 
-- pydicom=2.3.1
-- PySimpleGUI=4.60.4
-- Python>=3.9.13
+- pydicom>=3.0.2
+- FreeSimpleGUI>=5.2.0
+- Python>=3.14.4
 
 ### Recommended DEV Packages
 
