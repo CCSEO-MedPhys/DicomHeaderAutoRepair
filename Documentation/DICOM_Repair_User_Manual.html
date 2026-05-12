@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DICOM Header Auto Repair - User Manual</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f5f5f5;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 40px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+
+        header {
+            text-align: center;
+            border-bottom: 3px solid #0066cc;
+            padding-bottom: 30px;
+            margin-bottom: 40px;
+        }
+
+        header h1 {
+            font-size: 2.5em;
+            color: #0066cc;
+            margin-bottom: 10px;
+        }
+
+        header p {
+            font-size: 1.1em;
+            color: #666;
+        }
+
+        h2 {
+            color: #0066cc;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            border-left: 4px solid #0066cc;
+            padding-left: 15px;
+        }
+
+        h3 {
+            color: #0099cc;
+            margin-top: 25px;
+            margin-bottom: 15px;
+        }
+
+        p {
+            margin-bottom: 15px;
+            text-align: justify;
+        }
+
+        ul, ol {
+            margin-left: 30px;
+            margin-bottom: 15px;
+        }
+
+        li {
+            margin-bottom: 8px;
+        }
+
+        .section {
+            margin-bottom: 30px;
+        }
+
+        .step-box {
+            background-color: #f0f8ff;
+            border-left: 4px solid #0099cc;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .warning {
+            background-color: #fff3cd;
+            border-left: 4px solid #ff9800;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .note {
+            background-color: #e8f5e9;
+            border-left: 4px solid #4caf50;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .problem-section {
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            padding: 20px;
+            margin-bottom: 25px;
+            border-radius: 5px;
+        }
+
+        .problem-title {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #d32f2f;
+            margin-bottom: 15px;
+        }
+
+        .problem-subsection {
+            margin-bottom: 15px;
+            margin-left: 15px;
+        }
+
+        .problem-subsection-title {
+            font-weight: bold;
+            color: #0066cc;
+            margin-bottom: 8px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        table th {
+            background-color: #0066cc;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: bold;
+        }
+
+        table td {
+            border-bottom: 1px solid #ddd;
+            padding: 12px;
+        }
+
+        table tr:hover {
+            background-color: #f5f5f5;
+        }
+
+        code {
+            background-color: #f4f4f4;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+        }
+
+        .toc {
+            background-color: #f0f8ff;
+            border: 1px solid #0066cc;
+            padding: 20px;
+            margin-bottom: 30px;
+            border-radius: 5px;
+        }
+
+        .toc h3 {
+            margin-top: 0;
+        }
+
+        .toc ul {
+            list-style-type: none;
+            margin-left: 0;
+        }
+
+        .toc li {
+            margin-bottom: 10px;
+        }
+
+        .toc a {
+            color: #0066cc;
+            text-decoration: none;
+        }
+
+        .toc a:hover {
+            text-decoration: underline;
+        }
+
+        footer {
+            margin-top: 50px;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+            text-align: center;
+            color: #999;
+            font-size: 0.9em;
+        }
+
+        .page-break {
+            page-break-after: always;
+            margin-top: 50px;
+            padding-top: 50px;
+            border-top: 3px solid #0066cc;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>DICOM Header Auto Repair</h1>
+            <p>User Manual</p>
+        </header>
+
+        <div class="toc">
+            <h3>Table of Contents</h3>
+            <ul>
+                <li><a href="#overview">1. Overview</a></li>
+                <li><a href="#requirements">2. System Requirements</a></li>
+                <li><a href="#getting-started">3. Getting Started</a></li>
+                <li><a href="#usage">4. Using the DICOM Repair Tool</a></li>
+                <li><a href="#repair-functions">5. Repair Functions</a></li>
+                <li><a href="#troubleshooting">6. Troubleshooting</a></li>
+                <li><a href="#appendix-a">Appendix A: Known Problems and Automatic Repairs</a></li>
+                <li><a href="#appendix-b">Appendix B: Manual Investigation of DICOM Headers</a></li>
+                <li><a href="#appendix-c">Appendix C: Extending the Repair Tool</a></li>
+            </ul>
+        </div>
+
+        <!-- OVERVIEW SECTION -->
+        <div class="section">
+            <h2 id="overview">1. Overview</h2>
+            <p>
+                The DICOM Header Auto Repair tool is designed to identify and correct common errors in DICOM file headers that prevent successful import into medical imaging systems such as Eclipse. DICOM (Digital Imaging and Communications in Medicine) files contain metadata headers that must conform to strict standards for proper functionality.
+            </p>
+            <p>
+                This application automates the detection and repair of frequent header issues, significantly reducing manual intervention time and improving workflow efficiency.
+            </p>
+        </div>
+
+        <!-- REQUIREMENTS SECTION -->
+        <div class="section">
+            <h2 id="requirements">2. System Requirements</h2>
+            <ul>
+                <li>Windows 7 or later</li>
+                <li>Python 3.7 or later</li>
+                <li>At least 500 MB of free disk space</li>
+                <li>Read/write access to source and destination directories</li>
+            </ul>
+        </div>
+
+        <!-- GETTING STARTED SECTION -->
+        <div class="section">
+            <h2 id="getting-started">3. Getting Started</h2>
+
+            <h3>Installation</h3>
+            <ol>
+                <li>Extract the application files to your desired directory</li>
+                <li>Run the included virtual environment batch file: <code>MakeVenv.bat</code></li>
+                <li>Wait for the installation to complete</li>
+            </ol>
+
+            <h3>Launching the Application</h3>
+            <p>
+                Double-click the <code>DICOM Repair.bat</code> file or the <code>DICOM Repair</code> desktop shortcut to launch the application. The GUI will appear within a few seconds.
+            </p>
+        </div>
+
+        <!-- USAGE SECTION -->
+        <div class="section">
+            <h2 id="usage">4. Using the DICOM Repair Tool</h2>
+
+            <h3>Main Interface</h3>
+            <p>
+                The DICOM Repair tool features a straightforward graphical interface with the following components:
+            </p>
+
+            <div style="text-align: center; margin-bottom: 30px;">
+                <div style="display: inline-block; vertical-align: top;">
+                    <img src="Documentation/ScreenShots/MainWindow.png" alt="DICOM Repair Tool Main Interface" style="max-width: 400px; height: auto; border: 1px solid #ccc; border-radius: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+                    <p style="margin-top: 10px; font-style: italic; color: #666;">Figure 1: DICOM Repair Tool Main Interface</p>
+                </div>
+            </div>
+
+            <div class="step-box">
+                <strong>Input Directory Selection</strong><br>
+                Select the directory containing DICOM files to be repaired. Click the <strong>Browse</strong> button to open a file dialog.
+            </div>
+
+            <div class="step-box">
+                <strong>Include Sub-Directories</strong><br>
+                Check this option to recursively process all DICOM files in subdirectories of the selected input directory.
+            </div>
+
+            <div class="step-box">
+                <strong>Output Directory Selection</strong><br>
+                Select where repaired DICOM files will be saved. Click the <strong>Browse</strong> button to open a file dialog.
+            </div>
+
+            <h3>Step-by-Step Repair Process</h3>
+            <ol>
+                <li>
+                    <strong>Select Input Directory:</strong>
+                    <ul>
+                        <li>Click the <strong>Browse</strong> button next to "Select the directory containing DICOM files to be repaired"</li>
+                        <li>Navigate to and select the folder containing your DICOM files</li>
+                    </ul>
+                </li>
+                <li>
+                    <strong>Configure Processing:</strong>
+                    <ul>
+                        <li>Check "Include Sub-Directories?" if your DICOM files are organized in subfolders</li>
+                    </ul>
+                </li>
+                <li>
+                    <strong>Select Output Directory:</strong>
+                    <ul>
+                        <li>Click the <strong>Browse</strong> button next to "Select the directory where repaired DICOM files will be saved"</li>
+                        <li>Choose or create a folder where repaired files should be saved</li>
+                    </ul>
+                </li>
+                <li>
+                    <strong>Start Repair:</strong>
+                    <ul>
+                        <li>Click the <strong>Repair</strong> button to begin processing</li>
+                        <li>The status panel will display progress information</li>
+                    </ul>
+                </li>
+                <li>
+                    <strong>Monitor Progress:</strong>
+                    <ul>
+                        <li>The status section displays real-time information about files being processed</li>
+                        <li>A cyan progress bar at the bottom of the window indicates the overall completion percentage</li>
+                        <li>Once complete, the status will show a summary of repairs made</li>
+                    </ul>
+                </li>
+            </ol>
+
+            <div style="text-align: center; margin: 30px 0;">
+                <div style="display: inline-block; margin-right: 30px; vertical-align: top;">
+                    <img src="Documentation/ScreenShots/Repair in Progress.png" alt="Repair in Progress" style="max-width: 400px; height: auto; border: 1px solid #ccc; border-radius: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+                    <p style="margin-top: 10px; font-style: italic; color: #666;">Figure 2: Repair Process in Progress</p>
+                </div>
+                <div style="display: inline-block; vertical-align: top;">
+                    <img src="Documentation/ScreenShots/Completed Repair.png" alt="Completed Repair" style="max-width: 400px; height: auto; border: 1px solid #ccc; border-radius: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+                    <p style="margin-top: 10px; font-style: italic; color: #666;">Figure 3: Repair Completed</p>
+                </div>
+            </div>
+
+            <div class="note">
+                <strong>Tip:</strong> You can exit the application at any time using the <strong>Quit</strong> button or the window close button. However, it is recommended to allow the repair process to complete.
+            </div>
+        </div>
+
+        <!-- REPAIR FUNCTIONS SECTION -->
+        <div class="section">
+            <h2 id="repair-functions">5. Repair Functions</h2>
+            <p>
+                The DICOM Header Auto Repair tool automatically detects and corrects the following types of issues:
+            </p>
+
+            <h3>Automatic Repairs Performed</h3>
+            <ul>
+                <li><strong>Invalid Character Removal:</strong> Eliminates non-printable or invalid characters from string fields</li>
+                <li><strong>Modality Correction:</strong> Verifies and corrects incorrect DICOM modality tags</li>
+                <li><strong>Address Standardization:</strong> Resolves mismatched institution addresses across related series</li>
+                <li><strong>Tag Validation:</strong> Ensures all critical DICOM tags conform to standards</li>
+            </ul>
+
+            <h3>Output Files</h3>
+            <p>
+                Repaired DICOM files are saved to the specified output directory with the same filenames as the originals. Original files remain unmodified.
+            </p>
+        </div>
+
+        <!-- TROUBLESHOOTING SECTION -->
+        <div class="section">
+            <h2 id="troubleshooting">6. Troubleshooting</h2>
+
+            <h3>Application Won't Start</h3>
+            <ul>
+                <li>Ensure Python 3.7 or later is installed</li>
+                <li>Run the <code>MakeVenv.bat</code> file to install required dependencies</li>
+                <li>Check that you have adequate disk space</li>
+            </ul>
+
+            <h3>No Files Are Being Processed</h3>
+            <ul>
+                <li>Verify that the input directory contains valid DICOM files (usually with .dcm extension)</li>
+                <li>Check that "Include Sub-Directories?" is selected if files are in subdirectories</li>
+                <li>Ensure you have read permissions on the input directory</li>
+            </ul>
+
+            <h3>Output Directory Access Issues</h3>
+            <ul>
+                <li>Verify that you have write permissions on the output directory</li>
+                <li>Ensure the output directory has sufficient free space</li>
+                <li>Try using a different output directory if the current one is inaccessible</li>
+            </ul>
+
+            <h3>Repairs Don't Resolve Import Issues</h3>
+            <p>
+                If import issues persist after running the DICOM Repair tool, refer to <a href="#appendix-a">Appendix A</a> for detailed information about the automatically repaired problems. If you encounter a new type of issue not covered in this manual, see <a href="#appendix-b">Appendix B</a> for instructions on manually investigating DICOM headers using MicroDicom. New repair functions can be added to the tool for additional issue types—see <a href="#appendix-c">Appendix C</a> for details.
+            </p>
+        </div>
+
+        <!-- APPENDIX SECTION -->
+        <div class="page-break">
+            <h2 id="appendix-a">Appendix A: Known Problems and Automatic Repairs</h2>
+            <p>
+                This appendix describes common DICOM import problems that are automatically detected and repaired by the DICOM Header Auto Repair tool. For each problem, you will find the symptoms, diagnosis, epidemiology, and the automatic repair applied by the tool.
+            </p>
+        </div>
+
+        <!-- PROBLEM A: INCORRECT IMAGE MODALITY -->
+        <div class="problem-section">
+            <div class="problem-title">Problem A: Incorrect Image Modality</div>
+
+            <div class="problem-subsection">
+                <div class="problem-subsection-title">Symptoms</div>
+                <ul>
+                    <li>The images can be imported by Varian Eclipse, but Contouring crashes when the image set is opened</li>
+                </ul>
+            </div>
+
+            <div class="problem-subsection">
+                <div class="problem-subsection-title">Diagnosis</div>
+                <ul>
+                    <li>The DICOM Modality tag <code>(0008, 0060)</code> of the PET image series is labeled as "CT"</li>
+                    <li>In the past there have also been cases where CT image sets have been incorrectly labeled as 'NM' (Nuclear Medicine) or 'OT' (Other)</li>
+                </ul>
+            </div>
+
+            <div class="problem-subsection">
+                <div class="problem-subsection-title">Epidemiology</div>
+                <ul>
+                    <li>Recently, the most common case has been where PET images have been given the Modality 'CT'</li>
+                    <li>This occurs infrequently, but in short bursts</li>
+                    <li>The problem is usually resolved on the sending end within 1 day</li>
+                    <li>When one is found, watch for other image sets sent from the same institution within a 1-2 day time window</li>
+                </ul>
+            </div>
+
+            <div class="problem-subsection">
+                <div class="problem-subsection-title">Automatic Repair</div>
+                <ol>
+                    <li>The DICOM Repair tool automatically corrects the DICOM Modality tag <code>(0008, 0060)</code> to the appropriate value:
+                        <ul>
+                            <li>'PT' for Positron Emission Tomography (PET) images</li>
+                            <li>'CT' for Computed Tomography images</li>
+                        </ul>
+                    </li>
+                    <li>Note: If images with the incorrect modality have already been imported into Eclipse, they must be manually deleted from the "Selection" workspace before re-importing the repaired files</li>
+                    <li>After running the repair tool, re-import the corrected DICOM files into Eclipse</li>
+                </ol>
+            </div>
+        </div>
+
+        <!-- PROBLEM B: INVALID CHARACTERS -->
+        <div class="problem-section">
+            <div class="problem-title">Problem B: Invalid Characters</div>
+
+            <div class="problem-subsection">
+                <div class="problem-subsection-title">Symptoms</div>
+                <ul>
+                    <li>The images cannot be imported</li>
+                    <li>Import error message states: "Value is invalid: String contains '\' ...."</li>
+                    <li>Alternate import error message: "The patient of the data to be imported is unidentified or none of the data could be imported"</li>
+                </ul>
+            </div>
+
+            <div class="problem-subsection">
+                <div class="problem-subsection-title">Diagnosis</div>
+                <ul>
+                    <li>The DICOM "Body Part Examined" tag <code>(0018, 0015)</code> in the image series begins with a forward slash "/"</li>
+                    <li>In the past there have also been cases where the DICOM "Other Patient IDs" tag <code>(0010, 1000)</code> (no longer in use) began with a "/"</li>
+                    <li>Technically, any String DICOM value beginning with a "/" could cause this issue</li>
+                    <li><strong>Note:</strong> The "/" is actually not present in the header; this is MicroDicom's notation indicating the value contains non-printable characters</li>
+                </ul>
+            </div>
+
+            <div class="problem-subsection">
+                <div class="problem-subsection-title">Epidemiology</div>
+                <ul>
+                    <li>Recently, this problem has resulted from "illegal" characters in the CT BodyPart DICOM header tag</li>
+                    <li>In the past, cases have occurred in the "Other Patient IDs" tag <code>(0010, 1000)</code>, but this tag is no longer in use, making it unlikely</li>
+                    <li>These problems are relatively common</li>
+                    <li>Almost all cases have been in image sets coming from Ottawa, though not all images from Ottawa have this problem</li>
+                </ul>
+            </div>
+
+            <div class="problem-subsection">
+                <div class="problem-subsection-title">Automatic Repair</div>
+                <ol>
+                    <li>The DICOM Repair tool automatically identifies and removes non-printable and invalid characters from all string fields</li>
+                    <li>Specifically, any characters that would prevent successful import (such as control characters or invalid Unicode sequences) are cleared</li>
+                    <li>After running the repair tool, re-import the corrected DICOM files into Eclipse</li>
+                </ol>
+            </div>
+        </div>
+
+        <!-- PROBLEM C: MISMATCHED ADDRESSES -->
+        <div class="problem-section">
+            <div class="problem-title">Problem C: Mismatched Addresses</div>
+
+            <div class="problem-subsection">
+                <div class="problem-subsection-title">Symptoms</div>
+                <ul>
+                    <li>Varian Eclipse crashes while attempting to import the images</li>
+                    <li>Import error message includes the text: "Cannot insert duplicate key row in object 'dbo.Equipment'"</li>
+                </ul>
+            </div>
+
+            <div class="problem-subsection">
+                <div class="problem-subsection-title">Diagnosis</div>
+                <p>
+                    The DICOM "InstitutionAddress" tag <code>(0008, 0081)</code> is different for the CT and PET images, while other "Device References" remain the same:
+                </p>
+                <table>
+                    <tr>
+                        <th>DICOM Tag</th>
+                        <th>Tag Number</th>
+                    </tr>
+                    <tr>
+                        <td>Manufacturer</td>
+                        <td>(0008, 0070)</td>
+                    </tr>
+                    <tr>
+                        <td>Institution Name</td>
+                        <td>(0008, 0080)</td>
+                    </tr>
+                    <tr>
+                        <td>Station Name</td>
+                        <td>(0008, 1010)</td>
+                    </tr>
+                    <tr>
+                        <td>Institutional Department Name</td>
+                        <td>(0008, 1040)</td>
+                    </tr>
+                    <tr>
+                        <td>Manufacturer Model Name</td>
+                        <td>(0008, 1090)</td>
+                    </tr>
+                    <tr>
+                        <td>Device Serial Number</td>
+                        <td>(0018, 1000)</td>
+                    </tr>
+                    <tr>
+                        <td>Software Versions</td>
+                        <td>(0018, 1020)</td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="problem-subsection">
+                <div class="problem-subsection-title">Epidemiology</div>
+                <ul>
+                    <li>This error is unique to PET image sets coming from Mississauga and occurs with all PET image sets from that location</li>
+                    <li>This is so common that when diagnosing an import issue, the first step is to check whether it came from Mississauga, and if so, proceed assuming this is the problem</li>
+                    <li><strong>Technical Background:</strong> This problem arises from a known issue in the way Varian uniquely identifies diagnostic equipment in its database:
+                        <ul>
+                            <li>The DICOM Import/Export application checks the uniqueness of all equipment values</li>
+                            <li>However, the dbo.Equipment table's index XAK1Equipment checks all equipment values except the InstitutionAddress</li>
+                            <li>Therefore, if only the InstitutionAddress is different during the insertion of a new entry in the dbo.Equipment table, the operation fails and throws an error as it is considered a duplicate entry</li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="problem-subsection">
+                <div class="problem-subsection-title">Automatic Repair</div>
+                <ol>
+                    <li>The DICOM Repair tool automatically detects when the InstitutionAddress <code>(0008, 0081)</code> differs between related image series (CT and PET)</li>
+                    <li>The tool clears the InstitutionAddress value while preserving all other device reference information</li>
+                    <li>This ensures that all related images are identified as part of the same equipment setup, preventing the duplicate key error in Eclipse</li>
+                    <li>After running the repair tool, re-import the corrected DICOM files into Eclipse</li>
+                </ol>
+            </div>
+        </div>
+
+        <!-- APPENDIX B: MANUAL INVESTIGATION -->
+        <div class="page-break">
+            <h2 id="appendix-b">Appendix B: Manual Investigation of DICOM Headers</h2>
+            <p>
+                This appendix provides guidance for manually investigating DICOM headers when issues arise. Using tools like MicroDicom, you can examine the raw DICOM metadata to understand what values are present and identify problems that may require repair.
+            </p>
+
+            <h3>Analyzing Images Using MicroDicom</h3>
+            <p>
+                MicroDicom is a free DICOM viewer that allows you to inspect the header information of DICOM files in detail. Follow these steps to analyze a problematic DICOM file:
+            </p>
+
+            <h4>Step 1: Open MicroDicom</h4>
+            <p>
+                Launch MicroDicom on your computer. The application window will display.
+            </p>
+            <div style="text-align: center; margin: 20px 0;">
+                <img src="Documentation/ScreenShots/MicroDicom Import/2022-09-08_12-30-08.png" alt="MicroDicom Application Window" style="max-width: 500px; height: auto; border: 1px solid #ccc; border-radius: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+                <p style="margin-top: 10px; font-style: italic; color: #666;">Figure B1: MicroDicom Application Window</p>
+            </div>
+
+            <h4>Step 2: Import DICOM Files</h4>
+            <p>
+                Use the File menu or drag-and-drop to open DICOM files. MicroDicom will display the image and allow you to access the header information.
+            </p>
+            <div style="text-align: center; margin: 20px 0;">
+                <img src="Documentation/ScreenShots/MicroDicom Import/2022-09-08_12-31-00.png" alt="Importing DICOM Files" style="max-width: 500px; height: auto; border: 1px solid #ccc; border-radius: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+                <p style="margin-top: 10px; font-style: italic; color: #666;">Figure B2: Importing DICOM Files</p>
+            </div>
+
+            <h4>Step 3: View Header Information</h4>
+            <p>
+                Access the DICOM header/metadata panel to view all tags. Look for the specific tags mentioned in Appendix A:
+            </p>
+            <ul>
+                <li><code>(0008, 0060)</code> - Modality</li>
+                <li><code>(0018, 0015)</code> - Body Part Examined</li>
+                <li><code>(0010, 1000)</code> - Other Patient IDs</li>
+                <li><code>(0008, 0081)</code> - Institution Address</li>
+            </ul>
+            <div style="text-align: center; margin: 20px 0;">
+                <img src="Documentation/ScreenShots/MicroDicom Import/2022-09-08_12-31-17.png" alt="DICOM Header Information" style="max-width: 500px; height: auto; border: 1px solid #ccc; border-radius: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+                <p style="margin-top: 10px; font-style: italic; color: #666;">Figure B3: DICOM Header Information View</p>
+            </div>
+
+            <h4>Step 4: Identify Problem Areas</h4>
+            <p>
+                Check each relevant tag for issues:
+            </p>
+            <ul>
+                <li>Look for non-printable characters (displayed as "/" in MicroDicom)</li>
+                <li>Verify modality values are correct for the image type</li>
+                <li>Check institution addresses for consistency across related series</li>
+            </ul>
+            <div style="text-align: center; margin: 20px 0;">
+                <img src="Documentation/ScreenShots/MicroDicom Import/2022-09-08_12-35-43.png" alt="Identifying Issues in Headers" style="max-width: 500px; height: auto; border: 1px solid #ccc; border-radius: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+                <p style="margin-top: 10px; font-style: italic; color: #666;">Figure B4: Identifying Issues in DICOM Headers</p>
+            </div>
+
+            <h4>Step 5: Document Findings</h4>
+            <p>
+                Document the specific tags and values that are problematic. This information will help you understand whether the issue is one that can be automatically repaired by the DICOM Repair tool or if it represents a new type of problem requiring a custom repair function.
+            </p>
+            <div style="text-align: center; margin: 20px 0;">
+                <img src="Documentation/ScreenShots/MicroDicom Import/2022-09-08_12-36-25.png" alt="Detailed Header Inspection" style="max-width: 500px; height: auto; border: 1px solid #ccc; border-radius: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+                <p style="margin-top: 10px; font-style: italic; color: #666;">Figure B5: Detailed DICOM Header Inspection</p>
+            </div>
+        </div>
+
+        <!-- APPENDIX C: EXTENDING THE REPAIR TOOL -->
+        <div class="page-break">
+            <h2 id="appendix-c">Appendix C: Extending the Repair Tool</h2>
+            <p>
+                The DICOM Header Auto Repair tool is designed to be extensible. If you discover new types of DICOM import issues that are not currently handled, you can add custom repair functions to automatically fix them.
+            </p>
+
+            <h3>Adding New Repair Functions</h3>
+            <p>
+                New repair capabilities are implemented by adding functions to the <code>dicom_repair_functions.py</code> module. Each repair function follows a standard pattern and is registered in the <code>REPAIR_METHODS</code> list for automatic execution.
+            </p>
+
+            <h3>Getting Started</h3>
+            <p>
+                For detailed instructions on creating and integrating new repair functions, refer to the <strong>DICOM Repair Extension Guide</strong> (available as a separate document). This guide covers:
+            </p>
+            <ul>
+                <li>Understanding the repair function architecture</li>
+                <li>Creating a new repair function</li>
+                <li>Testing your repair function</li>
+                <li>Registering the function in the tool</li>
+                <li>Debugging common issues</li>
+            </ul>
+
+            <h3>Benefits of Custom Repair Functions</h3>
+            <ul>
+                <li><strong>Automated Processing:</strong> Once added, repairs run automatically on all DICOM files without manual intervention</li>
+                <li><strong>Consistency:</strong> Ensures all files are processed using the same repair logic</li>
+                <li><strong>Auditability:</strong> All repairs are logged and reported in the status output</li>
+                <li><strong>Maintainability:</strong> Functions are organized and documented for future reference</li>
+            </ul>
+
+            <h3>Example Workflow</h3>
+            <ol>
+                <li>Use MicroDicom (see Appendix B) to identify a new type of DICOM issue</li>
+                <li>Document the problem, affected DICOM tags, and proposed solution</li>
+                <li>Reference the <strong>DICOM Repair Extension Guide</strong> to create a repair function</li>
+                <li>Test the function on sample DICOM files</li>
+                <li>Add the function to the <code>REPAIR_METHODS</code> list in <code>dicom_repair_functions.py</code></li>
+                <li>The next time the tool runs, the new repair will be automatically applied</li>
+            </ol>
+        </div>
+
+        <!-- FOOTER -->
+        <footer>
+            <p>DICOM Header Auto Repair - User Manual</p>
+            <p>For additional information, please refer to the application README.md file or contact your IT support team.</p>
+        </footer>
+    </div>
+</body>
+</html>
