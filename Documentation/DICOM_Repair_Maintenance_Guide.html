@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DICOM Header Auto Repair - Maintenance & Deployment Guide</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f5f5f5;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 40px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        header {
+            text-align: center;
+            border-bottom: 3px solid #0066cc;
+            padding-bottom: 30px;
+            margin-bottom: 40px;
+        }
+
+        header h1 {
+            font-size: 2.5em;
+            color: #0066cc;
+            margin-bottom: 10px;
+        }
+
+        header p {
+            font-size: 1.1em;
+            color: #666;
+        }
+
+        h2 {
+            color: #0066cc;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            border-left: 4px solid #0066cc;
+            padding-left: 15px;
+        }
+
+        h3 {
+            color: #0099cc;
+            margin-top: 25px;
+            margin-bottom: 15px;
+        }
+
+        h4 {
+            color: #00aadd;
+            margin-top: 20px;
+            margin-bottom: 12px;
+        }
+
+        p {
+            margin-bottom: 15px;
+            text-align: justify;
+        }
+
+        ul,
+        ol {
+            margin-left: 30px;
+            margin-bottom: 15px;
+        }
+
+        li {
+            margin-bottom: 8px;
+        }
+
+        .section {
+            margin-bottom: 30px;
+        }
+
+        .step-box {
+            background-color: #f0f8ff;
+            border-left: 4px solid #0099cc;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .warning {
+            background-color: #fff3cd;
+            border-left: 4px solid #ff9800;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .note {
+            background-color: #e8f5e9;
+            border-left: 4px solid #4caf50;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .code-block {
+            background-color: #f4f4f4;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 15px;
+            margin-bottom: 15px;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            line-height: 1.4;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        table th {
+            background-color: #0066cc;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: bold;
+        }
+
+        table td {
+            border-bottom: 1px solid #ddd;
+            padding: 12px;
+        }
+
+        table tr:hover {
+            background-color: #f5f5f5;
+        }
+
+        code {
+            background-color: #f4f4f4;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+        }
+
+        .toc {
+            background-color: #f0f8ff;
+            border: 1px solid #0066cc;
+            padding: 20px;
+            margin-bottom: 30px;
+            border-radius: 5px;
+        }
+
+        .toc h3 {
+            margin-top: 0;
+        }
+
+        .toc ul {
+            list-style-type: none;
+            margin-left: 0;
+        }
+
+        .toc li {
+            margin-bottom: 10px;
+        }
+
+        .toc a {
+            color: #0066cc;
+            text-decoration: none;
+        }
+
+        .toc a:hover {
+            text-decoration: underline;
+        }
+
+        footer {
+            margin-top: 50px;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+            text-align: center;
+            color: #999;
+            font-size: 0.9em;
+        }
+
+        .page-break {
+            page-break-after: always;
+            margin-top: 50px;
+            padding-top: 50px;
+            border-top: 3px solid #0066cc;
+        }
+
+        .file-structure {
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            font-size: 0.9em;
+        }
+
+        .python-code {
+            background-color: #0f172a;
+            color: #e2e8f0;
+            border: 1px solid #334155;
+            border-left: 4px solid #38bdf8;
+            white-space: pre;
+            overflow-x: auto;
+            padding: 14px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+        }
+
+        .python-code code {
+            background: transparent;
+            color: inherit;
+            padding: 0;
+            border-radius: 0;
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 0.92em;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>DICOM Header Auto Repair</h1>
+            <p>Maintenance & Deployment Guide</p>
+            <p style="font-size: 0.95em; margin-top: 10px; color: #888;">For Medical Physicists and System
+                Administrators</p>
+        </header>
+
+        <div class="toc">
+            <h3>Table of Contents</h3>
+            <ul>
+                <li><a href="#overview">1. Overview</a></li>
+                <li><a href="#prerequisites">2. Prerequisites</a></li>
+                <li><a href="#system-requirements">3. System Requirements</a></li>
+                <li><a href="#maintenance">4. Maintenance</a></li>
+                <li><a href="#deployment">5. Deployment</a></li>
+                <li><a href="#extending">6. Extending the Tool with Custom Repairs</a></li>
+                <li><a href="#appendix-a">Appendix A: Manual Investigation of DICOM Headers</a></li>
+            </ul>
+        </div>
+
+        <!-- OVERVIEW SECTION -->
+        <div class="section">
+            <h2 id="overview">1. Overview</h2>
+            <p>
+                This document provides comprehensive guidance for medical physicists and system administrators
+                responsible for maintaining, deploying, and extending the DICOM Header Auto Repair tool. The tool
+                automates the detection and correction of common DICOM header errors that prevent successful import into
+                medical imaging systems such as Varian Eclipse.
+            </p>
+        </div>
+
+        <!-- PREREQUISITES SECTION -->
+        <div class="section">
+            <h2 id="prerequisites">2. Prerequisites</h2>
+
+            <h3>Knowledge Requirements</h3>
+            <ul>
+                <li><strong>DICOM Fundamentals:</strong> Understanding of DICOM file structure, tags, and metadata</li>
+                <li><strong>Python Basics:</strong> Familiarity with Python syntax, modules, and functions</li>
+                <li><strong>Command Line:</strong> Basic comfort with Windows PowerShell or Command Prompt</li>
+                <li><strong>File Systems:</strong> Understanding of directory structures and file permissions</li>
+            </ul>
+
+            <h3>Software Requirements</h3>
+            <ul>
+                <li>Python 3.7 or later (download from <code>python.org</code>)</li>
+                <li>Git (optional, for version control)</li>
+                <li>MicroDicom free DICOM viewer<sup>[1]</sup>, for investigating header issues</li>
+                <li>7-Zip (required for creating deployment zip packages)</li>
+                <li>Text editor or IDE such as Visual Studio Code</li>
+            </ul>
+        </div>
+
+        <!-- SYSTEM REQUIREMENTS SECTION -->
+        <div class="section">
+            <h2 id="system-requirements">3. System Requirements</h2>
+
+            <h3>Deployment Target Systems</h3>
+            <ul>
+                <li>Windows 7 or later</li>
+                <li>Python 3.7 or later installed and available in PATH</li>
+                <li>Minimum 500 MB free disk space for DICOM processing</li>
+                <li>Read/write access to source and destination directories</li>
+                <li>Administrative access for installation (optional, depending on deployment location)</li>
+            </ul>
+
+            <h3>Development Environment</h3>
+            <ul>
+                <li>Windows 10 or later recommended</li>
+                <li>Python development tools (IDE or code editor)</li>
+                <li>Git for version control (recommended)</li>
+                <li>Required Python packages: pydicom and FreeSimpleGUI (see Installation section)</li>
+            </ul>
+        </div>
+
+        <!-- MAINTENANCE SECTION -->
+        <div class="section">
+            <h2 id="maintenance">4. Maintenance</h2>
+
+            <h3>Package Structure</h3>
+            <p>
+                Understanding the package structure is essential for maintenance and extension:
+            </p>
+
+            <div class="file-structure">DicomHeaderAutoRepair/
+                ├── dicom_repair.py # Main GUI application entry point
+                ├── dicom_repair_gui.py # GUI components and user interface
+                ├── dicom_repair_functions.py # Repair functions (customize here)
+                ├── dicom_repair_tools.py # Utility functions for file processing
+                ├── app_config.py # Application configuration
+                ├── dicom_repair_config.toml # Configuration file
+                ├── requirements.txt # Python package dependencies
+                ├── ReadMe.md # User quick-start guide
+                ├── DICOM Test Data/ # Sample DICOM files for testing
+                ├── Documentation/ # Additional documentation
+                ├── Icons/ # Application icons
+                └── install/ # Deployment files
+            </div>
+
+            <h3>Key Components</h3>
+
+            <h4>dicom_repair.py</h4>
+            <p>
+                The main entry point for the application. Launches the GUI and coordinates the repair workflow.
+            </p>
+
+            <h4>dicom_repair_gui.py</h4>
+            <p>
+                Contains all graphical user interface components. Handles user input, directory selection, and status
+                display.
+            </p>
+
+            <h4>dicom_repair_functions.py</h4>
+            <p>
+                <strong>This is the file you will modify to add custom repair functions.</strong> Contains the repair
+                logic for each issue type. Each repair function follows a standard interface and is registered in the
+                <code>REPAIR_METHODS</code> list.
+            </p>
+
+            <h4>dicom_repair_tools.py</h4>
+            <p>
+                Contains utility functions used by repair functions and the main application:
+            </p>
+            <ul>
+                <li><code>perform_repairs()</code> - Main function that orchestrates file processing</li>
+                <li><code>count_repairs()</code> - Summarizes repair statistics</li>
+                <li>Other helper functions for DICOM file handling</li>
+            </ul>
+
+            <h3>Dependencies</h3>
+            <p>
+                The package has two primary dependencies:
+            </p>
+            <ul>
+                <li><strong>pydicom:</strong> Used for reading and manipulating DICOM file headers and metadata</li>
+                <li><strong>FreeSimpleGUI:</strong> Used to build the graphical user interface (GUI)</li>
+            </ul>
+            <p>
+                Check the current versions in <code>requirements.txt</code>:
+            </p>
+
+            <p>
+                To update dependencies, edit <code>requirements.txt</code> and reinstall:
+            </p>
+            <div class="code-block">.venv\Scripts\pip.exe install -r requirements.txt</div>
+            <p>
+                Use the virtual environment pip (or activate <code>.venv</code> first) so packages are installed into
+                the application environment, not system Python.
+            </p>
+
+            <h3>Version Control</h3>
+            <p>
+                Maintain version history by tracking changes to key files:
+            </p>
+            <ul>
+                <li><code>dicom_repair_functions.py</code> - When repair functions are added or modified</li>
+                <li><code>requirements.txt</code> - When dependencies are updated</li>
+                <li><code>app_config.py</code> - When configuration changes are made</li>
+            </ul>
+        </div>
+
+        <!-- DEPLOYMENT SECTION -->
+        <div class="section">
+            <h2 id="deployment">5. Deployment</h2>
+            <h3>Deployment Workflow Overview</h3>
+            <p>
+                The deployment process consists of three phases:
+            </p>
+            <ol>
+                <li>Run <code>distribute.bat</code> on the development machine to create a deployment package</li>
+                <li>Copy the resulting zip file to the target PC</li>
+                <li>Extract the zip file on the target PC and create shortcuts</li>
+            </ol>
+
+            <h3>Pre-Deployment Checklist</h3>
+            <ul>
+                <li>✓ Test all repairs on sample DICOM files</li>
+                <li>✓ Verify Python version compatibility (3.7+)</li>
+                <li>✓ Update version number and changelog</li>
+                <li>✓ Test on target Windows system</li>
+                <li>✓ All required files are in the project directory</li>
+                <li>✓ Verify 7-Zip is installed at C:\Program Files\7-Zip\7z.exe</li>
+            </ul>
+
+            <h3>Building the Distribution Package</h3>
+            <p>
+                On the development machine, build the distribution package:
+            </p>
+
+            <h4>Step 1: Prepare the Development Environment</h4>
+            <p>
+                Ensure all repairs and changes are complete and tested. The virtual environment (<code>.venv</code>)
+                should be current with all required dependencies.
+            </p>
+
+            <h4>Step 2: Run the Distribution Script</h4>
+            <p>
+                Navigate to the <code>install</code> directory and run <code>distribute.bat</code>:
+            </p>
+            <div class="code-block">cd install
+                distribute.bat</div>
+
+            <p>
+                This batch file will:
+            </p>
+            <ul>
+                <li>Copy all Python source files to the <code>For Distribution</code> folder</li>
+                <li>Copy the configuration file and license</li>
+                <li>Copy the application icon</li>
+                <li>Copy the entire virtual environment (<code>.venv</code> folder) with all dependencies already
+                    installed</li>
+                <li>Create a zip archive: <code>For Distribution.zip</code></li>
+            </ul>
+
+            <h4>Step 3: Verify the Package</h4>
+            <p>
+                Check that <code>For Distribution.zip</code> was created successfully. This file contains everything
+                needed for deployment.
+            </p>
+
+            <h3>Installation on Target System</h3>
+
+            <h4>Step 1: Transfer the Package</h4>
+            <p>
+                Copy the <code>For Distribution.zip</code> file to the target PC using any file transfer method (USB,
+                network share, email, etc.).
+            </p>
+
+            <h4>Step 2: Extract the Package</h4>
+            <p>
+                On the target PC, extract the zip file to the desired location, typically:
+            </p>
+            <div class="code-block">C:\Program Files\DicomHeaderAutoRepair</div>
+
+            <p>
+                Use Windows Explorer or 7-Zip to extract the archive. The directory structure will be created
+                automatically.
+            </p>
+
+            <h4>Step 3: Verify Installation</h4>
+            <p>
+                Test that the tool launches correctly by double-clicking <code>DICOM Repair.bat</code> in the extracted
+                folder. The GUI should appear without errors.
+            </p>
+
+            <h4>Step 4: Create Shortcuts (Optional)</h4>
+            <p>
+                For user convenience, create a desktop shortcut pointing to <code>DICOM Repair.bat</code>. You can:
+            </p>
+            <ul>
+                <li>Right-click on <code>DICOM Repair.bat</code> and select "Create shortcut"</li>
+                <li>Move the shortcut to the desktop</li>
+                <li>Alternatively, use the existing <code>DICOM Repair.bat - Shortcut.lnk</code> file and update its
+                    target path</li>
+            </ul>
+
+            <h3>Updating an Existing Installation</h3>
+
+            <p>
+                To deploy an update to a system that already has the tool installed:
+            </p>
+            <ol>
+                <li>Back up the current installation directory</li>
+                <li>Build a new distribution package on the development machine using <code>distribute.bat</code></li>
+                <li>Transfer the new <code>For Distribution.zip</code> to the target PC</li>
+                <li>Extract the new package, overwriting the old installation</li>
+                <li>Test the updated version with sample DICOM files</li>
+                <li>Document the update (version, changes, date)</li>
+            </ol>
+
+            <div class="note">
+                <strong>Note:</strong> The zip file already contains the complete virtual environment with all
+                dependencies. You do <strong>not</strong> need to run <code>MakeVenv.bat</code> after extracting the
+                package unless you need to update the Python environment (e.g., to a newer Python version or updated
+                pydicom library).
+            </div>
+
+            <h3>When to Use MakeVenv.bat</h3>
+
+            <p>
+                Use <code>MakeVenv.bat</code> only in these scenarios:
+            </p>
+            <ul>
+                <li><strong>Environment Update Required:</strong> Python version needs to be upgraded</li>
+                <li><strong>Dependency Update:</strong> A new version of pydicom or FreeSimpleGUI is required</li>
+                <li><strong>Corrupted Environment:</strong> The virtual environment has been corrupted and needs to be
+                    rebuilt</li>
+            </ul>
+
+            <p>
+                If you need to update the environment:
+            </p>
+            <ol>
+                <li>Delete the <code>.venv</code> folder in the installation directory</li>
+                <li>Run <code>MakeVenv.bat</code> from the installation directory</li>
+                <li>Wait for the process to complete (may take several minutes)</li>
+            </ol>
+
+            <div class="note">
+                <strong>Tip:</strong> Keep backups of at least the two most recent distribution packages for rollback
+                capability.
+            </div>
+        </div>
+
+        <!-- EXTENDING SECTION -->
+        <div class="section">
+            <h2 id="extending">6. Extending the Tool with Custom Repairs</h2>
+
+            <h3>Overview</h3>
+            <p>
+                The tool is designed to be extended with new repair functions. When you encounter a DICOM import issue
+                that isn't currently handled, you can add a custom repair function to automatically fix it.
+            </p>
+
+            <h3>Anatomy of a Repair Function</h3>
+
+
+            <h3>Step-by-Step: Creating a New Repair Function</h3>
+
+            <h4>Step 1: Investigate the Problem</h4>
+            <p>
+                Use MicroDicom (see Appendix A) to identify:
+            <ul>
+                <li>Which DICOM tags are affected</li>
+                <li>What values cause the problem</li>
+            </ul>
+            </p>
+
+            <h4>Step 2: Design the Repair Logic</h4>
+            <p>
+                Plan your approach:
+            </p>
+            <ul>
+                <li>Establish a way to programmatically detect the problem</li>
+                <li>Identify the DICOM tags and values that need to be modified</li>
+                <li>Determine what the correct value should be (or if the tag should just be removed)</li>
+                <li>Consider any edge cases that might need to be handled</li>
+            </ul>
+
+            <h4>Step 3: Write the Repair Function</h4>
+            <p>
+                All repair functions follow the same pattern.
+                Open <code>dicom_repair_functions.py</code> and add your function. Use this template:
+            </p>
+
+            <pre class="python-code"><code>def fix_problem_name(
+    dataset: pydicom.Dataset,
+    status_output: Callable,
+    ) -&gt; pydicom.Dataset:
+    """Brief description of what this repair does.
+
+    Detailed explanation of:
+    - The problem being fixed
+    - DICOM tags involved
+    - How the fix is applied
+
+    Args:
+        dataset: The full DICOM dataset.
+        status_output: Function for reporting results.
+
+    Returns:
+        The modified dataset.
+    """
+    if "TagName" in dataset:
+        value = dataset.data_element("TagName").value
+
+        if problem_detected(value):
+            dataset.data_element("TagName").value = fixed_value
+            message = f"Problem fixed: {tag_name} changed from X to Y"
+            status_output(message)
+
+    return dataset</code></pre>
+
+            <div class="note">
+                <strong>Important Note — pydicom.Dataset Tree Structure:</strong>
+                The pydicom.Dataset object has a hierarchical tree structure.
+                Some DICOM tags are nested within sub-sequences rather than at the top level of the dataset.
+                If a tag is not found using the standard <code>if "TagName" in dataset:</code> approach,
+                you may need to iterate through the relevant sub-sequences to locate it.
+                See the Example section below for an illustration of iterating through a sequence to access nested
+                elements.
+            </div>
+
+            <h3>Step 5: Test Your Function</h3>
+
+            <h4>Unit Testing</h4>
+            <p>
+                Create test DICOM files with the problem condition and verify:
+            </p>
+            <ul>
+                <li>The problem is correctly detected</li>
+                <li>The repair is correctly applied</li>
+                <li>The output message is informative</li>
+                <li>Edge cases are handled</li>
+            </ul>
+
+            <h4>Integration Testing</h4>
+            <p>
+                Run the full tool on test DICOM files:
+            </p>
+            <ol>
+                <li>Launch the GUI</li>
+                <li>Select directory with test files</li>
+                <li>Run the repair</li>
+                <li>Verify output files have been corrected</li>
+                <li>Verify status messages appear in the output panel</li>
+            </ol>
+
+            <h4>Validation Testing</h4>
+            <p>
+                Verify the repaired files import successfully:
+            </p>
+            <ul>
+                <li>Import repaired files into Eclipse</li>
+                <li>Verify no import errors</li>
+                <li>Confirm file opens without crashing</li>
+            </ul>
+
+            <h3>Best Practices</h3>
+
+            <h4>Error Handling</h4>
+            <p>
+                Always check if tags exist before accessing them:
+            </p>
+            <pre class="python-code"><code>if "TagName" in dataset:
+    value = dataset.data_element("TagName").value
+else:
+    pass</code></pre>
+
+            <h4>Type Safety</h4>
+            <p>
+                Check data types when needed:
+            </p>
+            <pre class="python-code"><code>if isinstance(value, str) and value.startswith("/"):
+            pass</code></pre>
+
+            <h4>Logging</h4>
+            <p>
+                Always report meaningful messages:
+            </p>
+            <pre class="python-code"><code>message = (
+    f"Problem detected: {tag_name}. "
+    f"Value changed from '{old_value}' to '{new_value}'"
+)
+status_output(message)</code></pre>
+
+            <h4>Documentation</h4>
+            <p>
+                Include detailed docstrings explaining:
+            </p>
+            <ul>
+                <li>What problem is being fixed</li>
+                <li>Which DICOM tags are involved</li>
+                <li>Frequency and impact of the problem</li>
+                <li>How the fix is applied</li>
+            </ul>
+
+            <h3>Example: Creating a New Repair Function</h3>
+
+            <p>
+                <strong>Scenario:</strong> You discover that some PET images have the "Radioactive Administered Activity
+                Units" tag (0018, 1074) in the wrong format, causing import failures.
+            </p>
+
+            <pre class="python-code"><code>def fix_activity_units(
+    dataset: pydicom.Dataset,
+    status_output: Callable,
+) -&gt; pydicom.Dataset:
+    """Fix incorrect activity units in PET images.
+
+    Some PET systems record activity in non-standard units.
+    This repair updates values to the expected DICOM standard.
+    """
+    modality = dataset.get("Modality", None)
+    if modality != "PT":
+        return dataset
+
+    sequence = dataset.get("RadiopharmaceuticalInformationSequence", [])
+    for item in sequence:
+        code_sequence = item.get("RadionuclideCodeSequence", [])
+        for code_item in code_sequence:
+            value = code_item.get("CodeValue", None)
+            if value == "WRONG_CODE":
+                code_item.CodeValue = "CORRECT_CODE"
+                status_output("PET activity units corrected")
+
+    return dataset</code></pre>
+
+            <p>
+                Then register it in <code>REPAIR_METHODS</code>. The next time the tool runs, this repair will be
+                automatically applied to all DICOM files.
+            </p>
+        </div>
+
+        <!-- APPENDIX A: MANUAL INVESTIGATION -->
+        <div class="page-break">
+            <h2 id="appendix-a">Appendix A: Manual Investigation of DICOM Headers</h2>
+            <p>
+                This appendix provides guidance for manually investigating DICOM headers when issues arise. Using tools
+                like MicroDicom, you can examine the raw DICOM metadata to understand what values are present and
+                identify problems that may require repair.
+            </p>
+
+            <h3>Analyzing Images Using MicroDicom</h3>
+            <p>
+                MicroDicom is a free DICOM viewer<sup>[1]</sup> that allows you to inspect the header information of
+                DICOM files in detail. Use the following workflow:
+            </p>
+
+            <h4>Step 1</h4>
+            <p>
+                Open File Explorer in the folder above the folder containing the DICOM images for analysis.
+            </p>
+
+            <h4>Step 2</h4>
+            <p>
+                Right-click on the folder containing the DICOM images and select "Open with MicroDicom DICOM Viewer".
+            </p>
+            <div style="text-align: center; margin: 20px 0;">
+                <img src="ScreenShots/MicroDicom Analysis/OpenWithMicroDicom.png"
+                    alt="Open with MicroDicom DICOM Viewer"
+                    style="max-width: 500px; height: auto; border: 1px solid #ccc; border-radius: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+                <p style="margin-top: 10px; font-style: italic; color: #666; text-align: center;">Figure A1: Open Folder
+                    with MicroDicom DICOM Viewer</p>
+            </div>
+
+            <h4>Step 3</h4>
+            <p>
+                The left panel contains the patient information and tree of images. Select the appropriate image set and
+                then any image from within that set.
+            </p>
+            <div style="text-align: center; margin: 20px 0;">
+                <img src="ScreenShots/MicroDicom Analysis/DicomTree.png" alt="Patient and image tree in MicroDicom"
+                    style="max-width: 500px; height: auto; border: 1px solid #ccc; border-radius: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+                <p style="margin-top: 10px; font-style: italic; color: #666; text-align: center;">Figure A2: Select
+                    Image Set from the Left-Side Tree</p>
+            </div>
+
+            <h4>Step 4</h4>
+            <p>
+                The right-hand panel displays the DICOM header information as a list of tags.
+            </p>
+            <div style="text-align: center; margin: 20px 0;">
+                <img src="ScreenShots/MicroDicom Analysis/DicomTagList.png" alt="DICOM tag list in MicroDicom"
+                    style="max-width: 500px; height: auto; border: 1px solid #ccc; border-radius: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+                <p style="margin-top: 10px; font-style: italic; color: #666; text-align: center;">Figure A3: DICOM Tag
+                    List</p>
+            </div>
+
+            <h4>Step 5</h4>
+            <p>
+                If the DICOM tags are not showing, click: View -> DICOM Tags Pane.
+            </p>
+            <div style="text-align: center; margin: 20px 0;">
+                <img src="ScreenShots/MicroDicom Analysis/ViewDicomTags.png" alt="Enable DICOM Tags Pane in View menu"
+                    style="max-width: 500px; height: auto; border: 1px solid #ccc; border-radius: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+                <p style="margin-top: 10px; font-style: italic; color: #666; text-align: center;">Figure A4: Enable
+                    DICOM Tags Pane</p>
+            </div>
+
+            <h4>Step 6</h4>
+            <p>
+                Import errors can be diagnosed through the contents of the DICOM tags.
+                Use the "PET Import Problems" tables for examples of issues related to DICOM tag information.
+            </p>
+
+            <h3>Next Steps</h3>
+            <p>
+                Once you have documented the problem:
+            </p>
+            <ol>
+                <li>Consult the "Extending the Tool with Custom Repairs" section (Section 6) to create an automated
+                    repair</li>
+                <li>Create an anonymized test dataset to confirm that your new repair function works as expected</li>
+                <li>Deploy the updated tool using the steps described in the "Deployment" section (Section 5)</li>
+            </ol>
+        </div>
+
+        <!-- FOOTER -->
+        <footer>
+            <p>DICOM Header Auto Repair - Maintenance & Deployment Guide</p>
+            <p>For technical support or questions, contact your system administrator or the development team.</p>
+            <p style="text-align: left; margin-top: 12px;"><sup>[1]</sup> MicroDicom is free for non-commercial use
+                only. Commercial use licenses can be purchased at <a
+                    href="https://www.microdicom.com/online-store.html">https://www.microdicom.com/online-store.html</a>.
+            </p>
+        </footer>
+    </div>
+</body>
+
+</html>

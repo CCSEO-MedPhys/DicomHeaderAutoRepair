@@ -217,8 +217,6 @@
                 <li><a href="#repair-functions">5. Repair Functions</a></li>
                 <li><a href="#troubleshooting">6. Troubleshooting</a></li>
                 <li><a href="#appendix-a">Appendix A: Known Problems and Automatic Repairs</a></li>
-                <li><a href="#appendix-b">Appendix B: Manual Investigation of DICOM Headers</a></li>
-                <li><a href="#appendix-c">Appendix C: Extending the Repair Tool</a></li>
             </ul>
         </div>
 
@@ -395,7 +393,7 @@
 
             <h3>Repairs Don't Resolve Import Issues</h3>
             <p>
-                If import issues persist after running the DICOM Repair tool, refer to <a href="#appendix-a">Appendix A</a> for detailed information about the automatically repaired problems. If you encounter a new type of issue not covered in this manual, see <a href="#appendix-b">Appendix B</a> for instructions on manually investigating DICOM headers using MicroDicom. New repair functions can be added to the tool for additional issue types—see <a href="#appendix-c">Appendix C</a> for details.
+                If import issues persist after running the DICOM Repair tool, refer to <a href="#appendix-a">Appendix A</a> for detailed information about the automatically repaired problems. If you encounter a new type of issue not covered in this manual, see the <strong>DICOM Repair Maintenance & Deployment Guide</strong> for instructions on manually investigating DICOM headers and extending the tool with custom repairs.
             </p>
         </div>
 
@@ -571,118 +569,6 @@
                     <li>After running the repair tool, re-import the corrected DICOM files into Eclipse</li>
                 </ol>
             </div>
-        </div>
-
-        <!-- APPENDIX B: MANUAL INVESTIGATION -->
-        <div class="page-break">
-            <h2 id="appendix-b">Appendix B: Manual Investigation of DICOM Headers</h2>
-            <p>
-                This appendix provides guidance for manually investigating DICOM headers when issues arise. Using tools like MicroDicom, you can examine the raw DICOM metadata to understand what values are present and identify problems that may require repair.
-            </p>
-
-            <h3>Analyzing Images Using MicroDicom</h3>
-            <p>
-                MicroDicom is a free DICOM viewer that allows you to inspect the header information of DICOM files in detail. Follow these steps to analyze a problematic DICOM file:
-            </p>
-
-            <h4>Step 1: Open MicroDicom</h4>
-            <p>
-                Launch MicroDicom on your computer. The application window will display.
-            </p>
-            <div style="text-align: center; margin: 20px 0;">
-                <img src="Documentation/ScreenShots/MicroDicom Import/2022-09-08_12-30-08.png" alt="MicroDicom Application Window" style="max-width: 500px; height: auto; border: 1px solid #ccc; border-radius: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
-                <p style="margin-top: 10px; font-style: italic; color: #666;">Figure B1: MicroDicom Application Window</p>
-            </div>
-
-            <h4>Step 2: Import DICOM Files</h4>
-            <p>
-                Use the File menu or drag-and-drop to open DICOM files. MicroDicom will display the image and allow you to access the header information.
-            </p>
-            <div style="text-align: center; margin: 20px 0;">
-                <img src="Documentation/ScreenShots/MicroDicom Import/2022-09-08_12-31-00.png" alt="Importing DICOM Files" style="max-width: 500px; height: auto; border: 1px solid #ccc; border-radius: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
-                <p style="margin-top: 10px; font-style: italic; color: #666;">Figure B2: Importing DICOM Files</p>
-            </div>
-
-            <h4>Step 3: View Header Information</h4>
-            <p>
-                Access the DICOM header/metadata panel to view all tags. Look for the specific tags mentioned in Appendix A:
-            </p>
-            <ul>
-                <li><code>(0008, 0060)</code> - Modality</li>
-                <li><code>(0018, 0015)</code> - Body Part Examined</li>
-                <li><code>(0010, 1000)</code> - Other Patient IDs</li>
-                <li><code>(0008, 0081)</code> - Institution Address</li>
-            </ul>
-            <div style="text-align: center; margin: 20px 0;">
-                <img src="Documentation/ScreenShots/MicroDicom Import/2022-09-08_12-31-17.png" alt="DICOM Header Information" style="max-width: 500px; height: auto; border: 1px solid #ccc; border-radius: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
-                <p style="margin-top: 10px; font-style: italic; color: #666;">Figure B3: DICOM Header Information View</p>
-            </div>
-
-            <h4>Step 4: Identify Problem Areas</h4>
-            <p>
-                Check each relevant tag for issues:
-            </p>
-            <ul>
-                <li>Look for non-printable characters (displayed as "/" in MicroDicom)</li>
-                <li>Verify modality values are correct for the image type</li>
-                <li>Check institution addresses for consistency across related series</li>
-            </ul>
-            <div style="text-align: center; margin: 20px 0;">
-                <img src="Documentation/ScreenShots/MicroDicom Import/2022-09-08_12-35-43.png" alt="Identifying Issues in Headers" style="max-width: 500px; height: auto; border: 1px solid #ccc; border-radius: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
-                <p style="margin-top: 10px; font-style: italic; color: #666;">Figure B4: Identifying Issues in DICOM Headers</p>
-            </div>
-
-            <h4>Step 5: Document Findings</h4>
-            <p>
-                Document the specific tags and values that are problematic. This information will help you understand whether the issue is one that can be automatically repaired by the DICOM Repair tool or if it represents a new type of problem requiring a custom repair function.
-            </p>
-            <div style="text-align: center; margin: 20px 0;">
-                <img src="Documentation/ScreenShots/MicroDicom Import/2022-09-08_12-36-25.png" alt="Detailed Header Inspection" style="max-width: 500px; height: auto; border: 1px solid #ccc; border-radius: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
-                <p style="margin-top: 10px; font-style: italic; color: #666;">Figure B5: Detailed DICOM Header Inspection</p>
-            </div>
-        </div>
-
-        <!-- APPENDIX C: EXTENDING THE REPAIR TOOL -->
-        <div class="page-break">
-            <h2 id="appendix-c">Appendix C: Extending the Repair Tool</h2>
-            <p>
-                The DICOM Header Auto Repair tool is designed to be extensible. If you discover new types of DICOM import issues that are not currently handled, you can add custom repair functions to automatically fix them.
-            </p>
-
-            <h3>Adding New Repair Functions</h3>
-            <p>
-                New repair capabilities are implemented by adding functions to the <code>dicom_repair_functions.py</code> module. Each repair function follows a standard pattern and is registered in the <code>REPAIR_METHODS</code> list for automatic execution.
-            </p>
-
-            <h3>Getting Started</h3>
-            <p>
-                For detailed instructions on creating and integrating new repair functions, refer to the <strong>DICOM Repair Extension Guide</strong> (available as a separate document). This guide covers:
-            </p>
-            <ul>
-                <li>Understanding the repair function architecture</li>
-                <li>Creating a new repair function</li>
-                <li>Testing your repair function</li>
-                <li>Registering the function in the tool</li>
-                <li>Debugging common issues</li>
-            </ul>
-
-            <h3>Benefits of Custom Repair Functions</h3>
-            <ul>
-                <li><strong>Automated Processing:</strong> Once added, repairs run automatically on all DICOM files without manual intervention</li>
-                <li><strong>Consistency:</strong> Ensures all files are processed using the same repair logic</li>
-                <li><strong>Auditability:</strong> All repairs are logged and reported in the status output</li>
-                <li><strong>Maintainability:</strong> Functions are organized and documented for future reference</li>
-            </ul>
-
-            <h3>Example Workflow</h3>
-            <ol>
-                <li>Use MicroDicom (see Appendix B) to identify a new type of DICOM issue</li>
-                <li>Document the problem, affected DICOM tags, and proposed solution</li>
-                <li>Reference the <strong>DICOM Repair Extension Guide</strong> to create a repair function</li>
-                <li>Test the function on sample DICOM files</li>
-                <li>Add the function to the <code>REPAIR_METHODS</code> list in <code>dicom_repair_functions.py</code></li>
-                <li>The next time the tool runs, the new repair will be automatically applied</li>
-            </ol>
         </div>
 
         <!-- FOOTER -->
