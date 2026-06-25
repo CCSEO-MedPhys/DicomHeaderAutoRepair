@@ -11,6 +11,7 @@ if errorlevel 1 (
 
 set "ROOT=."
 set "DIST=deploy"
+set DEPLOY_ZIP=DICOM_Import_Repair_deploy.zip
 
 rem Resolve package Python version from .python-version (single line like 3.14)
 if not exist ".python-version" (
@@ -39,7 +40,7 @@ echo Using PTH_FILE=%PTH_FILE%
 
 rem Clean old output
 if exist "%DIST%" rmdir /s /q "%DIST%"
-if exist "%DIST%.zip" del /q "%DIST%.zip"
+if exist "%DEPLOY_ZIP%" del /q "%DEPLOY_ZIP%"
 
 mkdir "%DIST%" || exit /b 1
 
@@ -85,6 +86,13 @@ if errorlevel 1 (
   exit /b 1
 )
 
+rem Explicitly add tkinter to the installation, since it is not included in the embedded runtime by default
+py -%PY_TAG% -m pip install --no-compile --target "%DIST%\runtime\Lib\site-packages" tk
+if errorlevel 1 (
+  echo Dependency vendoring failed.
+  exit /b 1
+)
+
 rem Create portable launcher
 > "%DIST%\DICOM_Repair.bat" (
   echo @echo off
@@ -94,14 +102,14 @@ rem Create portable launcher
 
 rem Zip output
 pushd "%DIST%"
-"C:\Program Files\7-Zip\7z.exe" a -tzip "..\%DIST%.zip" "." >nul
+"C:\Program Files\7-Zip\7z.exe" a -tzip "..\%DEPLOY_ZIP%" "." >nul
 popd
 if errorlevel 1 (
   echo Zip creation failed.
   exit /b 1
 )
 
-echo Portable build complete: %DIST%.zip
+echo Portable build complete: %DEPLOY_ZIP%
 
 popd
 endlocal
