@@ -89,7 +89,7 @@ rem Create portable launcher
 > "%DIST%\DICOM_Repair.bat" (
   echo @echo off
   echo setlocal
-  echo "%%~dp0runtime\python.exe" "%%~dp0dicom_repair.py"
+  echo .\runtime\python.exe .\launch.py
 )
 
 rem Zip output
