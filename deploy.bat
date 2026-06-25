@@ -211,11 +211,30 @@ rem Create portable launcher
 set "STAGE=create-launcher"
 > "%DIST%\DICOM_Repair.bat" (
   echo @echo off
-  echo setlocal
-  echo .\runtime\python.exe .\launch.py
+  echo setlocal EnableExtensions
+  echo.
+  echo set "SCRIPT_DIR=%%~dp0"
+  echo set "RUNTIME_DIR=%%SCRIPT_DIR%%runtime"
+  echo set "PATH=%%RUNTIME_DIR%%;%%RUNTIME_DIR%%\DLLs;%%PATH%%"
+  echo "%%RUNTIME_DIR%%\python.exe" "%%SCRIPT_DIR%%launch.py"
+  echo set "EXITCODE=%%ERRORLEVEL%%"
+  echo exit /b %%EXITCODE%%
 )
 if not exist "%DIST%\DICOM_Repair.bat" (
   echo Missing deploy launcher: %DIST%\DICOM_Repair.bat
+  goto :fail
+)
+
+rem Create UNC-safe launcher that bypasses cmd.exe
+> "%DIST%\DICOM_Repair.vbs" (
+  echo Set shell = CreateObject("WScript.Shell")
+  echo Set fso = CreateObject("Scripting.FileSystemObject")
+  echo scriptDir = fso.GetParentFolderName(WScript.ScriptFullName)
+  echo cmd = Chr(34) ^& scriptDir ^& "\\runtime\\python.exe" ^& Chr(34) ^& " " ^& Chr(34) ^& scriptDir ^& "\\launch.py" ^& Chr(34)
+  echo shell.Run cmd, 1, False
+)
+if not exist "%DIST%\DICOM_Repair.vbs" (
+  echo Missing deploy launcher: %DIST%\DICOM_Repair.vbs
   goto :fail
 )
 
@@ -244,6 +263,11 @@ if errorlevel 1 (
 findstr /i /c:"DICOM_Repair.bat" "%TEMP%\deploy_zip_list.txt" >nul
 if errorlevel 1 (
   echo Zip validation failed: DICOM_Repair.bat missing from archive.
+  goto :fail
+)
+findstr /i /c:"DICOM_Repair.vbs" "%TEMP%\deploy_zip_list.txt" >nul
+if errorlevel 1 (
+  echo Zip validation failed: DICOM_Repair.vbs missing from archive.
   goto :fail
 )
 findstr /i /c:"deploy\\" "%TEMP%\deploy_zip_list.txt" >nul
